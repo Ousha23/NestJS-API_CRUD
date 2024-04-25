@@ -4,17 +4,17 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { SignupDto } from './dto/signupDto';
+import { SignupDto } from './dto/signup.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { MailerService } from 'src/mailer/mailer.service';
-import { SigninDto } from './dto/signinDto';
+import { SigninDto } from './dto/signin.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { ResetPasswordDemandDto } from './dto/resetPasswordDemandDto';
+import { ResetPasswordDemandDto } from './dto/resetPasswordDemand.dto';
 import * as speakeasy from 'speakeasy';
-import { ResetPasswordConfirmationDto } from './dto/resetPasswordConfirmationDto';
-import { DeleteAccountDto } from './dto/deleteAccountDto';
+import { ResetPasswordConfirmationDto } from './dto/resetPasswordConfirmation.dto';
+import { DeleteAccountDto } from './dto/deleteAccount.dto';
 
 // pour faire un CRUD on utilisera Prisma npm install @prisma/client
 // on crée un mo prisma et s prisma pour nous permettre d'intéragir avc la bdd
@@ -114,14 +114,16 @@ export class AuthService {
     };
   }
   async deleteAccount(userId: number, deleteAccountDto: DeleteAccountDto) {
-    const {password} = deleteAccountDto;
-    const user = await this.prismaService.user.findUnique({ where: { userId } });
+    const { password } = deleteAccountDto;
+    const user = await this.prismaService.user.findUnique({
+      where: { userId },
+    });
     if (!user) throw new NotFoundException('User not found');
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) throw new UnauthorizedException('Password does not match');
-    
-    await this.prismaService.user.delete({where : {userId}})
-    return {data : "user deleted"}
+
+    await this.prismaService.user.delete({ where: { userId } });
+    return { data: 'user deleted' };
   }
 }

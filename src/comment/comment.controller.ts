@@ -1,10 +1,23 @@
-import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { Request } from 'express';
-import { CreateCommentDto } from './dto/createCommentDto';
+import { CreateCommentDto } from './dto/createComment.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { UpdateCommentDto } from './dto/updateCommentDto';
+import { UpdateCommentDto } from './dto/updateComment.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('Comments')
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
@@ -21,7 +34,7 @@ export class CommentController {
   deleteComment(
     @Param('id', ParseIntPipe) commentId: number,
     @Req() request: Request,
-    @Body("postId") postId : number,
+    @Body('postId') postId: number,
   ) {
     const userId = request.user['userId'];
     return this.commentService.delete(commentId, userId, postId);
@@ -32,7 +45,7 @@ export class CommentController {
   updateComment(
     @Param('id', ParseIntPipe) commentId: number,
     @Req() request: Request,
-    @Body() updateCommentDto : UpdateCommentDto,
+    @Body() updateCommentDto: UpdateCommentDto,
   ) {
     const userId = request.user['userId'];
     return this.commentService.update(commentId, userId, updateCommentDto);
